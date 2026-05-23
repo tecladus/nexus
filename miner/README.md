@@ -4,33 +4,69 @@ Cliente minero del protocolo NEXUS. Recibe tareas de la red, las ejecuta en hard
 
 ## Estado actual
 
-**v0.1 — Prototipo educativo de commit-reveal**
+**v0.2 — Inferencia real con Ollama**
 
-El archivo `miner_demo.py` demuestra el corazón del protocolo: cómo un minero ejecuta una tarea, publica un commit criptográfico del resultado, y se enfrenta a verificación probabilística que hace que la honestidad sea estrictamente más rentable que la trampa.
+Ya no es simulación: el minero ejecuta inferencia real de LLMs en tu GPU local usando Ollama como runtime. El protocolo commit-reveal funciona end-to-end con outputs reales.
 
-## Ejecutar la demo
+## Módulos
 
+| Archivo | Qué hace |
+|---|---|
+| `protocol.py` | Schemas de mensajes del protocolo (TaskMessage, CommitMessage, etc.) |
+| `ollama_client.py` | Cliente HTTP para Ollama (sin dependencias externas) |
+| `executor.py` | Ejecuta tareas, genera commits, maneja determinismo |
+| `storage.py` | Persistencia local con SQLite |
+| `main.py` | Punto de entrada que integra todo |
+
+## Requisitos
+
+1. **Python 3.10+**
+2. **Ollama** corriendo en `localhost:11434` ([instalar](https://ollama.com/download))
+3. **Al menos un modelo descargado**, recomendado:
+   ```bash
+   ollama pull qwen2.5:7b
+   ```
+
+## Ejecutar
+
+**Demo del ciclo completo** (recibir tarea → ejecutar → commit → reveal → verify → pago):
 ```bash
-python3 miner_demo.py
+python3 main.py
 ```
 
-Vas a ver:
+**Benchmark de tu hardware**:
+```bash
+python3 main.py --benchmark
+```
 
-1. **Demo 1**: Un minero honesto procesando 3 tareas detalladamente
-2. **Demo 2**: Un minero tramposo siendo descubierto y perdiendo su stake
-3. **Simulación estadística**: 1000 tareas cada uno comparando ambos comportamientos
+**Inspeccionar la base de datos**:
+```bash
+sqlite3 nexus_miner.db
+> SELECT task_id, status, payment_nxs FROM tasks ORDER BY received_at DESC;
+> SELECT * FROM miner_stats;
+```
 
-## Lo que demuestra
+## Tests
 
-El output final muestra que:
+```bash
+pip install pytest
+pytest tests/ -v
+```
 
-- Minero honesto: balance positivo proporcional al trabajo hecho
-- Minero tramposo: balance NEGATIVO porque el slashing > ganancias por trampa
+## Cómo funciona el determinismo
 
-Esto valida empíricamente el diseño económico descrito en [docs/ARCHITECTURE.md](../docs/ARCHITECTURE.md), sección 5.1.
+Los LLMs son no-determinísticos por defecto. Para que dos mineros lleguen al
+mismo output (necesario para verificación byte-a-byte), forzamos:
+
+- `temperature = 0.0` (sin aleatoriedad)
+- `top_k = 1` (siempre el token más probable)
+- `seed = sha256(task_id)[:8]` (mismo seed para todos los mineros de la misma tarea)
+
+Esto se aplica en modo `EXACT`. En modo `SEMANTIC` (futuro), permitimos
+variación y comparamos por similaridad de embeddings.
 
 ## Próximas versiones
 
-- v0.2: Integración con un modelo LLM real (Llama 3.1 8B) corriendo localmente
 - v0.3: Comunicación P2P con orquestador (libp2p)
 - v0.4: Cliente Rust de alta performance
+- v0.5: Integración con smart contracts en testnet

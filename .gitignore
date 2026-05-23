@@ -53,3 +53,4 @@ out/
 # Resultados de tareas (datos efímeros)
 task_results/
 miner_cache/
+nexus_miner.db

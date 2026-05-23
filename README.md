@@ -50,7 +50,7 @@ nexus/
 ## Roadmap
 
 - [x] Sesión 1: Arquitectura técnica + setup inicial
-- [ ] Sesión 2: Prototipo del minero funcional
+- [x] Sesión 2: Prototipo del minero funcional con inferencia de IA real
 - [ ] Sesión 3: Orquestador + comunicación P2P
 - [ ] Sesión 4: Smart contracts en testnet
 - [ ] Sesión 5: Integración end-to-end
