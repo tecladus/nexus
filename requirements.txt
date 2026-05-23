@@ -1,0 +1,22 @@
+# Dependencias del cliente NEXUS
+# Por ahora la demo no usa nada externo, pero para sesiones futuras:
+
+# Para criptografía (sesión 3+)
+# cryptography>=42.0.0
+# pynacl>=1.5.0
+
+# Para inferencia de IA local (sesión 2)
+# torch>=2.2.0
+# transformers>=4.40.0
+# accelerate>=0.30.0
+
+# Para red P2P (sesión 3)
+# py-libp2p>=0.2.0
+
+# Para interactuar con Ethereum/EVM (sesión 4)
+# web3>=6.15.0
+# eth-account>=0.11.0
+
+# Tests
+# pytest>=8.0.0
+# pytest-asyncio>=0.23.0

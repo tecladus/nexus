@@ -1,0 +1,55 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+venv/
+env/
+.venv/
+*.egg-info/
+dist/
+build/
+
+# Configs locales (no subir claves privadas nunca!)
+.env
+.env.local
+*.key
+*.pem
+config/local.yaml
+wallets/
+
+# Logs
+*.log
+logs/
+
+# Datos de prueba
+data/
+models/
+*.bin
+*.safetensors
+*.gguf
+
+# IDEs
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Node (cuando agreguemos JS para frontend/contracts)
+node_modules/
+package-lock.json
+
+# Solidity / Hardhat / Foundry
+artifacts/
+cache/
+typechain-types/
+out/
+
+# Resultados de tareas (datos efímeros)
+task_results/
+miner_cache/
