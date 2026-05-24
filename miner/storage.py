@@ -20,12 +20,22 @@ from contextlib import contextmanager
 from dataclasses import dataclass, asdict
 from typing import Optional
 from pathlib import Path
+from enum import Enum
 
-import sys
-sys.path.insert(0, str(Path(__file__).parent))
-from protocol import _convert_enums
 
 DEFAULT_DB_PATH = Path("nexus_miner.db")
+
+
+def _json_default(obj):
+    """Encoder JSON que sabe manejar Enums (DeterminismMode, etc.)."""
+    if isinstance(obj, Enum):
+        return obj.value
+    raise TypeError(f"Object of type {obj.__class__.__name__} is not JSON serializable")
+
+
+def _safe_dumps(obj) -> str:
+    """json.dumps que maneja Enums."""
+    return json.dumps(obj, default=_json_default)
 
 
 SCHEMA_V1 = """
@@ -118,7 +128,7 @@ class MinerDB:
                    (task_id, client_id, kind, spec_json, payment_nxs,
                     status, received_at)
                    VALUES (?, ?, ?, ?, ?, ?, ?)""",
-                (task_id, client_id, kind, json.dumps(_convert_enums(spec)), payment_nxs,
+                (task_id, client_id, kind, _safe_dumps(spec), payment_nxs,
                  "received", time.time())
             )
 
@@ -142,7 +152,7 @@ class MinerDB:
                        inference_metadata = ?
                    WHERE task_id = ?""",
                 ("revealed", result, nonce, time.time(),
-                 json.dumps(metadata), task_id)
+                 _safe_dumps(metadata), task_id)
             )
 
     def record_payment(self, task_id: str, miner_id: str,
@@ -173,7 +183,7 @@ class MinerDB:
                    (timestamp, event_type, task_id, details)
                    VALUES (?, ?, ?, ?)""",
                 (time.time(), "SLASH", task_id,
-                 json.dumps({"amount": slashed_nxs, "reason": reason}))
+                 _safe_dumps({"amount": slashed_nxs, "reason": reason}))
             )
 
     def get_task(self, task_id: str) -> Optional[dict]:

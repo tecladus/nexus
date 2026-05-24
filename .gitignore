@@ -19,6 +19,12 @@ build/
 config/local.yaml
 wallets/
 
+# Archivos de identidad de nodos — contienen claves privadas
+*_identity.json
+orchestrator_identity.json
+miner_identity.json
+client_identity.json
+
 # Logs
 *.log
 logs/
@@ -53,4 +59,3 @@ out/
 # Resultados de tareas (datos efímeros)
 task_results/
 miner_cache/
-nexus_miner.db

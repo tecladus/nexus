@@ -85,9 +85,11 @@ class TaskExecutor:
 
     def execute(self, task: TaskMessage) -> ExecutionResult:
         """Ejecuta la tarea y devuelve commit + reveal listos para publicar."""
-        if task.kind != TaskKind.LLM_INFERENCE.value and task.kind != TaskKind.LLM_INFERENCE:
+        # Normalizar kind: puede llegar como Enum o como string
+        kind_value = task.kind.value if hasattr(task.kind, 'value') else str(task.kind)
+        if kind_value != "llm_inference":
             raise NotImplementedError(
-                f"En v0.1 solo soportamos LLM_INFERENCE. Recibí: {task.kind}"
+                f"En v0.3 solo soportamos LLM_INFERENCE. Recibí: {kind_value}"
             )
 
         # Parsear spec
